@@ -24,6 +24,8 @@ jobs:
 
       - name: 打包项目
         run: npm run build
+        env:
+          VITE_DEEPSEEK_API_KEY: ${{ secrets.VITE_DEEPSEEK_API_KEY }}
 
       - name: 部署到Pages
         uses: peaceiris/actions-gh-pages@v4
