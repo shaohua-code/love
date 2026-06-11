@@ -4,7 +4,7 @@ import { resolve } from 'path'
 
 export default defineConfig({
   // 相对路径，支持纯静态 HTML 部署（GitHub Pages 等）
-  base: './',
+  base: '/love/',
   plugins: [vue()],
   resolve: {
     alias: {
