@@ -6,7 +6,7 @@
  */
 
 /** DeepSeek API 密钥，从环境变量读取，打包后写入构建产物 */
-export const API_KEY = import.meta.env.VITE_DEEPSEEK_API_KEY || ''
+export const API_KEY = 'sk-1a7a6264b74b42e9a21624fdbd4f04d1' 
 
 /**
  * 对话模型名称（同一 API Key 通用）
