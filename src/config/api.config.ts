@@ -93,11 +93,12 @@ export function getApiEndpoints(): ApiEndpoint[] {
     })
   }
 
-  // 公共 CORS 代理兜底（SSE 稳定性一般，仅作备选）
+  // 公共 CORS 代理兜底（通过 reqHeaders 参数透传 Authorization，避免代理丢弃请求头）
+  const corsProxyBase = `https://corsproxy.io/?reqHeaders=${encodeURIComponent(`authorization:Bearer ${API_KEY}`)}&url=`
   endpoints.push({
     name: 'cors-proxy',
-    url: 'https://corsproxy.io/?' + encodeURIComponent(DEEPSEEK_API_URL),
-    buildHeaders: buildAuthHeaders,
+    url: corsProxyBase + encodeURIComponent(DEEPSEEK_API_URL),
+    buildHeaders: () => ({ 'Content-Type': 'application/json' }),
   })
 
   // 直连官方 API（纯静态 HTML 通常被浏览器 CORS 策略拦截）
