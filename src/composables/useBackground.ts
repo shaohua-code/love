@@ -98,6 +98,14 @@ function initAudio(): void {
     audioInstance = new Audio(mod.default)
     audioInstance.loop = true
     audioInstance.volume = 0.4
+    audioInstance.addEventListener('ended', () => {
+      if (audioInstance) {
+        audioInstance.currentTime = 0
+        audioInstance.play().catch(() => {
+          isMusicPlaying.value = false
+        })
+      }
+    })
   })
 }
 
