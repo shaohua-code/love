@@ -1,4 +1,4 @@
-import{u as i,s as l}from"./index-BaSexmv8.js";import{d as c,f as m,o as d,U as p,V as u}from"./vue-vendor-DP4rC7Ky.js";import"./antd-D0iRcJPw.js";const x=c({__name:"StarsBg",setup(f){const n=i(),a=m(null);return d(()=>{if(a.value)for(let s=0;s<60;s++){const t=document.createElement("div"),o=Math.random()*2+1;t.className="star-item absolute cursor-pointer rounded-full bg-white animate-twinkle transition-transform",t.style.cssText=`
+import{u as i,s as l}from"./index-BCKgaxyZ.js";import{d as c,f as m,o as d,U as p,V as u}from"./vue-vendor-DP4rC7Ky.js";import"./antd-D0iRcJPw.js";const x=c({__name:"StarsBg",setup(f){const n=i(),a=m(null);return d(()=>{if(a.value)for(let s=0;s<60;s++){const t=document.createElement("div"),o=Math.random()*2+1;t.className="star-item absolute cursor-pointer rounded-full bg-white animate-twinkle transition-transform",t.style.cssText=`
       width:${o}px;height:${o}px;
       left:${Math.random()*100}%;top:${Math.random()*100}%;
       animation-delay:${Math.random()*3}s;
