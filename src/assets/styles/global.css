@@ -1,0 +1,288 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ================================================================
+ * 全局基础样式
+ * ================================================================ */
+
+/* AI 消息内容的 Markdown 样式 */
+.ai-content p {
+  margin: 0.4em 0;
+}
+.ai-content p:first-child {
+  margin-top: 0;
+}
+.ai-content p:last-child {
+  margin-bottom: 0;
+}
+.ai-content strong {
+  font-weight: 600;
+  color: #2d1b36;
+}
+.ai-content em {
+  font-style: italic;
+  color: #ba90c6;
+}
+.ai-content ul,
+.ai-content ol {
+  margin: 0.5em 0;
+  padding-left: 1.2em;
+}
+.ai-content li {
+  margin: 0.2em 0;
+}
+.ai-content blockquote {
+  margin: 0.5em 0;
+  padding-left: 0.8em;
+  border-left: 2px solid #e8a0bf;
+  color: #2d1b36aa;
+}
+.ai-content code {
+  background: #f8e8ee;
+  padding: 0.1em 0.35em;
+  border-radius: 4px;
+  font-size: 0.85em;
+}
+.ai-content h1,
+.ai-content h2,
+.ai-content h3 {
+  font-family: 'Noto Serif SC', serif;
+  font-weight: 400;
+  margin: 0.6em 0 0.3em;
+}
+.ai-content a {
+  color: #ba90c6;
+  text-decoration: underline;
+}
+
+/* 快捷按钮横向滚动隐藏滚动条 */
+.chip-scroll::-webkit-scrollbar {
+  display: none;
+}
+.chip-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* ================================================================
+ * 自定义动画 keyframes
+ * ================================================================ */
+
+@keyframes fall {
+  0% {
+    transform: translateY(-10vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.7;
+  }
+  90% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(110vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes emojiRain {
+  0% {
+    transform: translateY(-5vh) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(110vh) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+@keyframes flashPink {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 0.35;
+  }
+}
+
+@keyframes heartFloat {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-8px) scale(1.1);
+  }
+}
+
+@keyframes wobble {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-6deg) scale(1.05);
+  }
+  75% {
+    transform: rotate(6deg) scale(1.05);
+  }
+}
+
+@keyframes flyAcross {
+  0% {
+    transform: translateX(-120vw) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(120vw) rotate(720deg);
+    opacity: 0.8;
+  }
+}
+
+@keyframes runAway {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2) translateX(30px);
+  }
+  100% {
+    transform: scale(0) translateX(80px);
+    opacity: 0;
+  }
+}
+
+@keyframes spinFortune {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(1080deg);
+  }
+}
+
+@keyframes floatBubble {
+  0% {
+    transform: translateY(0) scale(0.8);
+    opacity: 0;
+  }
+  15% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-120px) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes introMoonPulse {
+  0%, 100% {
+    box-shadow: 0 0 20px #fff9f580;
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 40px #ffc8ddcc;
+    transform: scale(1.08);
+  }
+}
+
+@keyframes introPigBounce {
+  0%, 100% {
+    transform: translateY(0) rotate(-5deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(5deg);
+  }
+}
+
+@keyframes introShake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-6px) rotate(-2deg);
+  }
+  40% {
+    transform: translateX(6px) rotate(2deg);
+  }
+  60% {
+    transform: translateX(-4px);
+  }
+  80% {
+    transform: translateX(4px);
+  }
+}
+
+@keyframes introGlow {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes introCharge {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+@keyframes introScratchReveal {
+  0% {
+    clip-path: inset(0 100% 0 0);
+  }
+  100% {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes introFloatItem {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  33% {
+    transform: translateY(-10px) rotate(8deg);
+  }
+  66% {
+    transform: translateY(5px) rotate(-5deg);
+  }
+}
+
+@keyframes introSparkleBurst {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(2.5);
+    opacity: 0;
+  }
+}
+
+/* 动画工具类 */
+.wobble-anim {
+  animation: wobble 0.5s ease-in-out;
+}
+
+.intro-moon {
+  animation: introMoonPulse 4s ease-in-out infinite;
+}
+
+.intro-pig {
+  animation: introPigBounce 2s ease-in-out infinite;
+}
+
+.intro-shake {
+  animation: introShake 0.4s ease-in-out;
+}
+
+.intro-float-item {
+  animation: introFloatItem 4s ease-in-out infinite;
+}
+
+.intro-scratch-cover {
+  background: repeating-linear-gradient(45deg, #ba90c6, #ba90c6 8px, #e8a0bf 8px, #e8a0bf 16px);
+}

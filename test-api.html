@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeepSeek API 测试</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+    textarea { width: 100%; height: 100px; margin: 10px 0; padding: 10px; }
+    button { padding: 10px 20px; font-size: 16px; cursor: pointer; background: #007AFF; color: white; border: none; border-radius: 5px; }
+    button:disabled { background: #ccc; }
+    #output { background: #f5f5f5; padding: 15px; border-radius: 5px; margin-top: 20px; white-space: pre-wrap; word-break: break-all; }
+    .status { margin: 10px 0; padding: 10px; border-radius: 5px; }
+    .status.ok { background: #e8f5e9; color: #2e7d32; }
+    .status.error { background: #ffebee; color: #c62828; }
+  </style>
+</head>
+<body>
+  <h1>DeepSeek API 测试</h1>
+  
+  <div id="status" class="status"></div>
+  
+  <div>
+    <label for="input">输入消息:</label>
+    <textarea id="input" placeholder="请输入你想测试的消息...">你好</textarea>
+  </div>
+  
+  <button id="sendBtn" onclick="testAPI()">发送</button>
+  
+  <div id="output"></div>
+
+  <script>
+    const API_KEY = 'sk-1a7a6264b74b42e9a21624fdbd4f04d1';
+    const API_URL = 'https://api.deepseek.com/chat/completions';
+    
+    async function testAPI() {
+      const input = document.getElementById('input');
+      const output = document.getElementById('output');
+      const status = document.getElementById('status');
+      const sendBtn = document.getElementById('sendBtn');
+      
+      sendBtn.disabled = true;
+      status.textContent = '正在发送请求...';
+      status.className = 'status';
+      output.textContent = '';
+      
+      const userMessage = input.value || '你好';
+      
+      const payload = {
+        model: 'deepseek-chat',
+        messages: [
+          { role: 'user', content: userMessage }
+        ],
+        stream: true
+      };
+      
+      console.log('📤 发送请求:', payload);
+      
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${API_KEY}`
+          },
+          body: JSON.stringify(payload)
+        });
+        
+        console.log('📥 收到响应:', response);
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+        
+        status.textContent = '✅ 请求成功，正在读取流...';
+        status.className = 'status ok';
+        
+        if (!response.body) {
+          throw new Error('响应体为空');
+        }
+        
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let buffer = '';
+        let fullContent = '';
+        
+        while (true) {
+          const { done, value } = await reader.read();
+          
+          console.log('📦 读取到数据:', { done, value });
+          
+          if (done) {
+            console.log('✅ 流结束');
+            break;
+          }
+          
+          const decoded = decoder.decode(value, { stream: true });
+          console.log('📝 解码内容:', decoded);
+          
+          buffer += decoded;
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+          
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed || !trimmed.startsWith('data:')) continue;
+            
+            const data = trimmed.slice(5).trim();
+            console.log('🔍 提取 data:', data);
+            
+            if (data === '[DONE]') {
+              console.log('🏁 收到 [DONE]');
+              continue;
+            }
+            
+            try {
+              const json = JSON.parse(data);
+              console.log('📋 解析 JSON:', json);
+              
+              const delta = json.choices?.[0]?.delta?.content;
+              if (delta) {
+                console.log('✨ 提取内容:', delta);
+                fullContent += delta;
+                output.textContent = fullContent;
+              }
+            } catch (e) {
+              console.warn('❌ JSON 解析失败:', e);
+            }
+          }
+        }
+        
+        status.textContent = `✅ 完成！共收到 ${fullContent.length} 个字符`;
+        status.className = 'status ok';
+        
+      } catch (error) {
+        console.error('❌ 错误:', error);
+        status.textContent = `❌ 错误: ${error.message}`;
+        status.className = 'status error';
+        output.textContent = error.stack || String(error);
+      } finally {
+        sendBtn.disabled = false;
+      }
+    }
+    
+    console.log('✅ 测试页面已加载');
+    document.getElementById('status').textContent = '准备就绪';
+  </script>
+</body>
+</html>

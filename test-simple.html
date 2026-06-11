@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DeepSeek API 简单测试</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+    button { padding: 10px 20px; margin: 10px; cursor: pointer; }
+    #output { background: #f5f5f5; padding: 15px; border-radius: 5px; margin-top: 20px; white-space: pre-wrap; }
+    .log { margin: 5px 0; padding: 5px; border-left: 3px solid #ccc; }
+    .log.info { border-color: #2196F3; background: #E3F2FD; }
+    .log.error { border-color: #f44336; background: #FFEBEE; }
+    .log.success { border-color: #4CAF50; background: #E8F5E9; }
+  </style>
+</head>
+<body>
+  <h1>DeepSeek API 简单测试</h1>
+  
+  <div>
+    <button onclick="testNonStream()">测试非流式请求</button>
+    <button onclick="testStream()">测试流式请求</button>
+  </div>
+  
+  <div id="output"></div>
+
+  <script>
+    const API_KEY = 'sk-1a7a6264b74b42e9a21624fdbd4f04d1';
+    const API_URL = 'https://api.deepseek.com/chat/completions';
+    
+    function log(type, message) {
+      const output = document.getElementById('output');
+      const div = document.createElement('div');
+      div.className = `log ${type}`;
+      div.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+      output.appendChild(div);
+      console.log(`[${type.toUpperCase()}]`, message);
+    }
+    
+    async function testNonStream() {
+      document.getElementById('output').innerHTML = '';
+      log('info', '开始测试非流式请求...');
+      
+      const payload = {
+        model: 'deepseek-chat',
+        messages: [{ role: 'user', content: '你好' }],
+        stream: false,
+        max_tokens: 100
+      };
+      
+      log('info', '请求 payload: ' + JSON.stringify(payload, null, 2));
+      
+      try {
+        log('info', '发送请求到: ' + API_URL);
+        
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${API_KEY}`
+          },
+          body: JSON.stringify(payload)
+        });
+        
+        log('info', '收到响应, status: ' + response.status);
+        log('info', 'Content-Type: ' + response.headers.get('Content-Type'));
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          log('error', '响应错误: ' + errorText);
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+        
+        const data = await response.json();
+        log('success', '响应数据: ' + JSON.stringify(data, null, 2));
+        
+        const content = data.choices?.[0]?.message?.content || '';
+        log('success', '提取的内容: ' + content);
+        
+      } catch (err) {
+        log('error', '请求失败: ' + err.message);
+        console.error('完整错误:', err);
+      }
+    }
+    
+    async function testStream() {
+      document.getElementById('output').innerHTML = '';
+      log('info', '开始测试流式请求...');
+      
+      const payload = {
+        model: 'deepseek-chat',
+        messages: [{ role: 'user', content: '你好' }],
+        stream: true,
+        max_tokens: 100
+      };
+      
+      log('info', '请求 payload: ' + JSON.stringify(payload, null, 2));
+      
+      try {
+        log('info', '发送请求到: ' + API_URL);
+        
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${API_KEY}`
+          },
+          body: JSON.stringify(payload)
+        });
+        
+        log('info', '收到响应, status: ' + response.status);
+        log('info', 'Content-Type: ' + response.headers.get('Content-Type'));
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          log('error', '响应错误: ' + errorText);
+          throw new Error(`HTTP ${response.status}: ${errorText}`);
+        }
+        
+        if (!response.body) {
+          throw new Error('响应体为空');
+        }
+        
+        log('info', '开始读取流...');
+        
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder('utf-8');
+        let buffer = '';
+        let fullContent = '';
+        let chunkCount = 0;
+        
+        while (true) {
+          const { done, value } = await reader.read();
+          chunkCount++;
+          
+          if (done) {
+            log('info', '流结束, 共 ' + chunkCount + ' 个 chunk');
+            break;
+          }
+          
+          const decoded = decoder.decode(value, { stream: true });
+          buffer += decoded;
+          
+          const lines = buffer.split('\n');
+          buffer = lines.pop() || '';
+          
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed || !trimmed.startsWith('data:')) continue;
+            
+            const data = trimmed.slice(5).trim();
+            if (data === '[DONE]') continue;
+            
+            try {
+              const json = JSON.parse(data);
+              const delta = json.choices?.[0]?.delta?.content;
+              if (delta) {
+                fullContent += delta;
+                log('info', '收到内容: ' + delta);
+              }
+            } catch (e) {
+              log('error', 'JSON 解析失败: ' + e.message);
+            }
+          }
+        }
+        
+        log('success', '完整内容: ' + fullContent);
+        
+      } catch (err) {
+        log('error', '请求失败: ' + err.message);
+        console.error('完整错误:', err);
+      }
+    }
+  </script>
+</body>
+</html>
